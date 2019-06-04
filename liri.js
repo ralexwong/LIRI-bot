@@ -13,12 +13,13 @@ var inquirer = require("inquirer");
 var fs = require("fs");
 
 // request npm package
-var request = require("request")
+var request = require("request");
+
+var moment = require("moment");
 
 
 var category = process.argv[2];
-var choice = process.argv[3];
-
+var choice = "";
 
 switch (category) {
     case "concert-this":
@@ -46,24 +47,59 @@ switch (category) {
 
 function whichCategory() {
 
-    if (category === 'concert-this' && process.argv.length <= 3) {
-        queryURL = "https://rest.bandsintown.com/artists/artists/events?app_id=codingbootcamp";
-    } else {
-        queryURL = "https://rest.bandsintown.com/artists/" + choice + "/events?app_id=codingbootcamp";
+    for (var i = 3; i < process.argv.length; i++) {
+        if (i > 3 && i < process.argv.length) {
+            choice = choice + " " + process.argv[i];
+            console.log(choice);
+        } else {
+            choice += process.argv[i];
+            console.log(choice);
+        }
     }
 
+    // bands in town api
+    if (category === "concert-this" && process.argv.length <= 3) {
+        queryURL = "https://rest.bandsintown.com/artists/artists/events?app_id=codingbootcamp";
+    } 
+    else 
+    {
+        queryURL = "https://rest.bandsintown.com/artists/" + choice + "/events?app_id=codingbootcamp";
+
+    }
+
+    // spotofy api
     if (category === "spotify-this-song" && process.argv.length <= 3) {
         choice = "The+Sign+Ace+of+Base"
     }
 
+    // ombd api
     if (category === "movie-this" && process.argv.length <= 3) {
-        queryUrl = "http://www.omdbapi.com/?t=mr+nobody&y=&plot=short&apikey=trilogy"
-    } else {
+        choice = "mr nobody"
+        queryUrl = "http://www.omdbapi.com/?t=" + choice + "&y=&plot=short&apikey=trilogy"
+    } 
+    else {
         queryUrl = "http://www.omdbapi.com/?t=" + choice + "&y=&plot=short&apikey=trilogy";
     }
 }
 
 function findConcert() {
+
+    // issue API request
+    request (queryURL, function (error, response, body) {
+        var concert = JSON.parse(body);
+
+        for (var i=0; i < concert.length; i++) {
+            console.log("Venue: " + concert[i].venue.name);
+
+            console.log("Location: " + concert[i].venue.city + ", " + concert[i].venue.region);
+        }
+
+        // use momentJS to format concert date
+        var date = concertData[i].datetime;
+        date = moment(date).format("MM/DD/YYYY");
+        console.log("Date: " + date);
+            
+    });
 
 }
 
@@ -88,7 +124,7 @@ function findSpotify() {
     // and so forth
 }
 
-function findMovie() {
+function findMovie(choice) {
 
     // Then run a request with axios to the OMDB API with the movie specified
     axios.get("http://www.omdbapi.com/?t=" + choice + "&y=&plot=short&apikey=trilogy").then(
@@ -134,14 +170,16 @@ function doWhatItSays() {
     if (error) {
       return console.log(error);
     }
-  
-    // We will then print the contents of data
-    console.log(data);
 
     // Then split it by commas (to make it more readable)
     var dataArr = data.split(",");
 
-    
+    var userChoice = dataArr[1];
+
+    findMovie(userChoice)
+
+    // cannot get this part to work
+    // end up with backstreet boys as my JSON
 
     });
 
