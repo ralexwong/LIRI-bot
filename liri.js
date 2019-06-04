@@ -9,15 +9,65 @@ var axios = require("axios");
 // Load the NPM Package inquirer
 var inquirer = require("inquirer");
 
+// fs is a core Node package for reading and writing files
+var fs = require("fs");
+
+// request npm package
+var request = require("request")
+
 
 var category = process.argv[2];
 var choice = process.argv[3];
 
-if (category === `concert-this`) {
+
+switch (category) {
+    case "concert-this":
+        whichCategory(); 
+        findConcert(choice); 
+        break;
+
+    case "spotify-this-song":
+        whichCategory();
+        findSpotify(choice); 
+        break;
+
+    case "movie-this":
+        whichCategory();
+        findMovie(choice);
+        break;
+
+    case "do-what-it-says": 
+        doWhatItSays(choice);
+        break;
+
+    default:
+        console.log("Only commands are 'concert-this', 'spotify-this-song', 'movie-this' and 'do-what-it-says");
+}
+
+function whichCategory() {
+
+    if (category === 'concert-this' && process.argv.length <= 3) {
+        queryURL = "https://rest.bandsintown.com/artists/artists/events?app_id=codingbootcamp";
+    } else {
+        queryURL = "https://rest.bandsintown.com/artists/" + choice + "/events?app_id=codingbootcamp";
+    }
+
+    if (category === "spotify-this-song" && process.argv.length <= 3) {
+        choice = "The+Sign+Ace+of+Base"
+    }
+
+    if (category === "movie-this" && process.argv.length <= 3) {
+        queryUrl = "http://www.omdbapi.com/?t=mr+nobody&y=&plot=short&apikey=trilogy"
+    } else {
+        queryUrl = "http://www.omdbapi.com/?t=" + choice + "&y=&plot=short&apikey=trilogy";
+    }
+}
+
+function findConcert() {
 
 }
 
-if (category === `spotify-this-song`) {
+function findSpotify() {
 
 
     spotify.search({ type: 'track', query: choice, limit: 1 })
@@ -38,12 +88,19 @@ if (category === `spotify-this-song`) {
     // and so forth
 }
 
-if (category === `movie-this`) {
+function findMovie() {
 
     // Then run a request with axios to the OMDB API with the movie specified
     axios.get("http://www.omdbapi.com/?t=" + choice + "&y=&plot=short&apikey=trilogy").then(
         function(response) {
-            console.log(response.data);
+            console.log("Title: " + response.data.Title)
+            console.log("Year: " + response.data.Year);
+            console.log("Rated: " + response.data.Rated);
+            console.log("Ratings: " + response.data.Ratings[1].Value);
+            console.log("Country: " + response.data.Country);
+            console.log("Language: " + response.data.Language);
+            console.log("Plot: " + response.data.Plot);
+            console.log("Actors: " + response.data.Actors);
         })
         .catch(function(error) {
             if (error.response) {
@@ -68,6 +125,24 @@ if (category === `movie-this`) {
 
 }
 
-if (category === `do-what-it-says`) {
+function doWhatItSays() {
+
+    // The code will store the contents of the reading inside the variable "data"
+    fs.readFile("random.txt", "utf8", function(error, data) {
+
+    // If the code experiences any errors it will log the error to the console.
+    if (error) {
+      return console.log(error);
+    }
+  
+    // We will then print the contents of data
+    console.log(data);
+
+    // Then split it by commas (to make it more readable)
+    var dataArr = data.split(",");
+
+    
+
+    });
 
 }
