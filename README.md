@@ -1,6 +1,6 @@
 # LIRI-bot
 
-deploayed at 
+deploayed at https://ralexwong.github.io/LIRI-bot/
 
 
 ## Concert API
